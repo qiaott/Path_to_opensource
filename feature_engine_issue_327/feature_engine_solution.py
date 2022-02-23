@@ -8,7 +8,7 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: Python 3 (ipykernel)
+#     display_name: Python 3
 #     language: python
 #     name: python3
 # ---
@@ -25,7 +25,6 @@ from utils import (
 
 # ### 1. Prepare a dataset
 
-# Initialize data to lists.
 data = pd.DataFrame(
     [
         {"a": 1, "b": 2, "c": 3, "d": 2, "e": -1},
@@ -56,10 +55,10 @@ corr, selected_cols_double_check = correlated_feat_removal(X=data, cols=list(sel
 
 assert selected_cols == selected_cols_double_check, "The first round of correlated feature removal is not complete"
 
-# ### 3. Feature selection based on different criterias, e.g. std, missings
+# ### 3. Feature selection based on different criteria, e.g. std, missings
 
 # Get the correlation matrix and std difference matrix
-corr = get_corr_matix(X=data, cols=None)
+corr = get_corr_matix(X=data)
 std = get_second_matrix(X=data, matrix_type="std")
 missing = get_second_matrix(X=data, matrix_type="missings")
 
@@ -68,9 +67,13 @@ corr_mask = get_corr_mask(corr=corr, corr_thresh=0.8)
 std_mask = get_matrix_mask(matrix=std, threshold=0, mask_value=1)
 missing_mask = get_matrix_mask(matrix=missing, threshold=0, mask_value=1)
 
+corr
+
 std
 
 std_mask
+
+missing
 
 missing_mask
 
