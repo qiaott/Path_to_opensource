@@ -133,3 +133,5 @@ dmypy.json
 .AppleDouble
 .LSOverride
 .README.md.swp
+
+.idea
