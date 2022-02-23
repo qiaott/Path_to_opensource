@@ -1,6 +1,6 @@
-# Path to opensource :notes:
+# Path to opensource :sparkles:
 
-In this repo, I would like to record all the solutions that I propose for open source issues :sparkles:
+In this repo, I would like to record all the solutions that I propose for open source issues :dizzy:
 
 
 | Package | Issue number & link |Solution|
