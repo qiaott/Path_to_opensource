@@ -128,7 +128,8 @@ def make_selection(corr_mask, matrix_mask, cols=None, corr_thresh=0.8):
     corr_mask: pandas dataframe of shape = [n_features, n_features],
                corr_mask is filled in with either 0 or correaltion values higher than threhold.
     matrix_mask: pandas dataframe of shape = [n_features, n_features]
-               matrix_mask is filled in with either 1 or -1 to indicate if one feature in columns has higher std/missing values than another in the rows/index.
+               matrix_mask is filled in with either 1 or -1 to indicate if one feature in columns has higher
+               std/missing values than another in the rows/index.
 
     """
     # Get the column list
