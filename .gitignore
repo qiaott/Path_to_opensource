@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Macbook
+.DS_Store
+.AppleDouble
+.LSOverride
+.README.md.swp
