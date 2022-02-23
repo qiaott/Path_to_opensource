@@ -140,13 +140,13 @@ def make_selection(corr_mask, matrix_mask, cols=None, corr_thresh=0.8):
 
     # Make the first round of selection along the column direction
     feats_to_drop_along_col = [col for col in cols if any(mask_union[col] < -1 * corr_thresh)]
-    logging.info(f"{len(feats_to_drop_along_col)} features dropped along the column: {feats_to_drop_along_col}")
+    logging.info(f"{len(feats_to_drop_along_col)} columns dropped along the column: {feats_to_drop_along_col}")
 
     # Make the second round of selection along the row(index) direction
     feats_to_drop_along_row = [
         col for col in cols if any(mask_union.T[col] > corr_thresh) and col not in feats_to_drop_along_col
     ]
-    logging.info(f"{len(feats_to_drop_along_row)} features dropped along the row: {feats_to_drop_along_row}")
+    logging.info(f"{len(feats_to_drop_along_row)} columns dropped along the row (index): {feats_to_drop_along_row}")
 
     # Get the list of feature to be dropped and kept
     feats_to_drop = feats_to_drop_along_col + feats_to_drop_along_row
