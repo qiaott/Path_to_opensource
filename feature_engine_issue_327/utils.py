@@ -57,7 +57,7 @@ def get_corr_matix(X, cols=None):
     return corr_upper
 
 
-def get_second_matrix(X, cols=None, matrix_type="std"):
+def get_second_matrix(X, cols=None, second_matrix_type="std"):
     """
     Calculate the second matrix which will be used as the selection criteria.
 
@@ -65,14 +65,14 @@ def get_second_matrix(X, cols=None, matrix_type="std"):
     ----------
     X: pandas dataframe of shape = [n_samples, n_features]
     cols: list. if None, then the function will make the selection among all features.
-    matrix_type: string. matrix_type can choose from one of these ["std", "missings"]
+    second_matrix_type: string. second_matrix_type can choose from one of these ["std", "missings"]
     """
     # Get the column list
     cols = cols if cols else X.columns
 
-    if matrix_type == "std":
+    if second_matrix_type == "std":
         matrix = X[cols].std()
-    elif matrix_type == "missings":
+    elif second_matrix_type == "missings":
         matrix = X[cols].isnull().sum()
     else:
         logging.info("please select from one of these ['std, 'missings']")
@@ -111,16 +111,16 @@ def get_matrix_mask(matrix, threshold=0, mask_value=1):
     mask_value float, default=1
     """
     matrix_mask = matrix.copy()
-    # When looking along the columns.
+    # When looking along the columns (left to right).
     # When a value is less than 0, it means the variance (std) of feature A in the column is
-    # smaller than feature B in the indx
-    # Then we want to drop feature A, we assign number 1 to mark it
+    # smaller than feature B in the index
+    # Then we want to drop feature A because it has smaller std, we assign number -1 to mark it
     matrix_mask[matrix_mask <= threshold] = -1 * mask_value
     matrix_mask[matrix_mask > threshold] = 1 * mask_value
     return matrix_mask
 
 
-def make_selection(corr_mask, matrix_mask, cols=None, corr_thresh=0.8):
+def make_selection(corr_mask, matrix_mask, cols=None, corr_thresh=0.8, second_matrix_type="std"):
     """Combine two selection criterias by  multipling them togther, and then make the selection based on results.
 
     Parameters
@@ -138,14 +138,21 @@ def make_selection(corr_mask, matrix_mask, cols=None, corr_thresh=0.8):
     # First combine two matrix by multipling their mask matrix together
     mask_union = matrix_mask * corr_mask
 
-    # Make the first round of selection along the column direction
-    feats_to_drop_along_col = [col for col in cols if any(mask_union[col] < -1 * corr_thresh)]
-    logging.info(f"{len(feats_to_drop_along_col)} columns dropped along the column: {feats_to_drop_along_col}")
+    if second_matrix_type == "std":
+        # Make the first round of selection along the column direction (left to right)
+        feats_to_drop_along_col = [col for col in cols if any(mask_union[col] <= -1 * corr_thresh)]
+        # Make the second round of selection along the row(index) direction (top to down)
+        feats_to_drop_along_row = [
+            col for col in cols if any(mask_union.T[col] >= corr_thresh) and col not in feats_to_drop_along_col
+        ]
 
-    # Make the second round of selection along the row(index) direction
-    feats_to_drop_along_row = [
-        col for col in cols if any(mask_union.T[col] > corr_thresh) and col not in feats_to_drop_along_col
-    ]
+    elif second_matrix_type == "missings":
+        feats_to_drop_along_col = [col for col in cols if any(mask_union[col] >= corr_thresh)]
+        feats_to_drop_along_row = [
+            col for col in cols if any(mask_union.T[col] <= -1 * corr_thresh) and col not in feats_to_drop_along_col
+        ]
+
+    logging.info(f"{len(feats_to_drop_along_col)} columns dropped along the column: {feats_to_drop_along_col}")
     logging.info(f"{len(feats_to_drop_along_row)} columns dropped along the row (index): {feats_to_drop_along_row}")
 
     # Get the list of feature to be dropped and kept
